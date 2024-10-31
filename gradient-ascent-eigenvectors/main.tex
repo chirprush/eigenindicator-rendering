@@ -65,7 +65,7 @@ Similarly, for the second expression, we have
     &= 2 v_k \| A \vec{v} \|^2 + 2 \| \vec{v} \|^2 \sum_{i = 1}^{n} A_{ik} \, (\vec{w}_i \cdot \vec{v}) \\
     &= 2 v_k \| A \vec{v} \|^2 + 2 \| \vec{v} \|^2 (A \vec{v} \cdot \vec{u}_k)
 .\end{align*}
-I've no doubt that these values are terribly inefficient to compute, but it's interesting that the expression isn't entirely intractable.
+There are no doubt other ways to arrive at these expressions, but I find it very nice that they aren't completely intractable.
 
 With the general expression for the partial derivative determined, we can now calculate the gradient as per usual:
 \[
@@ -82,14 +82,19 @@ This allows us to define a sequence of converging guesses \( \vec{g}_1, \vec{g}_
 ,\]
 where \( \gamma_n \) is some sequence that denotes a learning rate for steps of the gradient ascent process. In total, each calculation of \( \grad \Gamma_A (\vec{g}_n) \) takes \( O(n^2) \) time.
 
-Hopefully this works
-
-Actually this works with surpising success. One can probably uniformly distribute points around the unit ball and then run the process, although that is another order of magnitude slower probably.
-
-An interesting exercise would be to determine the convergence rate of this algorithm generally.
-
 \begin{remark}
-    One must note that this doesn't really handle eigenvectors that are associated with complex eigenvalues, but that's probably fine.
+    One must note that this doesn't really handle eigenvectors that are
+    associated with complex eigenvalues, but that's probably fine (there's
+    likely some complex conjugates one has to include). In addition it would be
+    interesting to find and perhaps prove the convergence rate of the
+    algorithm. Although this only finds one eigenvector/value pair at a time,
+    one could likely place points around the unit sphere and see where they
+    converge to.
+
+    Following this notion, actually, it would be interesting to see the
+    probability that, given a uniformly randomly chosen point on the surface of
+    unit sphere, the algorithm converges to a particular eigen-pair. Is it
+    necessarily true that they would be equiprobable?
 \end{remark}
 
 Code:

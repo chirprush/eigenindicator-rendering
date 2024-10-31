@@ -90,11 +90,16 @@ print("Eigenvalue:", np.linalg.norm(np.dot(A, g)) / np.linalg.norm(g))
 
 # Tbh I'm not quite sure how accurate this is in terms of actually giving the
 # convergence rate (I might have to look at the actual math later) but it gives
-# that the convergence rate is roughly linear (although like some of the terms
-# are far greater or lower)
+# that the convergence rate is roughly linear (although some of the terms are
+# far greater or lower)
 """
 estimates = [
-    log(abs((scores[k] - scores[k-1]) / (scores[k-1] - scores[k-2]))) / log(abs((scores[k-1] - scores[k-2]) / (scores[k-2] - scores[k-3])))
+    log(abs(
+        (scores[k] - scores[k-1]) /
+        (scores[k-1] - scores[k-2]))) /
+        log(abs((scores[k-1] - scores[k-2]) /
+        (scores[k-2] - scores[k-3])
+    ))
     for k in range(3, len(scores))
 ]
 

@@ -1,0 +1,98 @@
+\documentclass[a4paper, 12pt]{article}
+
+\usepackage{chirpstyle}
+
+\begin{document}
+
+\section*{Computationally Finding Eigenvectors, Geometrically}
+
+\subsection*{Preface}
+I'm not quite familiar with many of the high-spec current algorithms that are used to find eigenvalues and eigenvectors with numeric stability, but I suppose they make great use of the characteristic polynomial and other math shenanigans that I probably am not all too familiar with nor sound all too interesting. Thus, it would seem fun to circumvent all that and create a highly scuffed algorithm to locate an eigenvector (potentially multiple?) using geometrical intuition, which seems far more easy to work with.
+
+\subsection*{Ideas}
+Suppose we have a real matrix \( A \) (with non-zero determinant) which we wish to find an eigenvector of. Traditionally, an eigenvector of \( A \) is defined to be any vector \( \vec{v} \) such that
+\[
+    A \vec{v} = \lambda \vec{v}
+,\]
+where \( \lambda \) is the corresponding eigenvalue. In geometric terms, the origin, the point described by \( \vec{v} \), and the image of \( \vec{v} \) under \( A \) must be collinear. Motivated by this, we can instead characterize an eigenvector of \( A \) differently. Observe that
+\[
+    \cos{\theta} = \frac{A\vec{v} \cdot \vec{v}}{\| A \vec{v} \| \| \vec{v} \|}
+.\]
+Principally, this value is \( -1 \) or \( 1 \) whenever \( \vec{v} \) is an eigenvector. To simplify this, we shall take
+\[
+    \cos^2{\theta} = \frac{( A\vec{v} \cdot \vec{v} )^2}{\| A \vec{v} \|^2 \| \vec{v} \|^2}
+\]
+as our metric for how ``close,'' \( \vec{v} \) is to being an eigenvector, with \( 0 \) representing that \( \vec{v} \) is orthogonal to an (all?) eigenvector and \( 1 \) representing that \( \vec{v} \) is in fact an eigenvector.
+
+In order to simplify matters slightly, we shall want to take \( \| \vec{v} \| = 1 \). This would guarantee that each \( \vec{v} \) that we find such that \( \cos^2{\theta} = 1 \) is part of a different family (I wonder what the right term is for this) of eigenvectors. Since we want to travel around in space however and doing so is cumbersome on a sphere, we will leave the magnitude unfixed for now. Thus, our metric is given by
+\[
+    \Gamma_A (\vec{v}) := \frac{(A \vec{v} \cdot \vec{v})^2}{\| A \vec{v} \|^2 \| \vec{v} \|^2}
+,\]
+and this is differentiable, meaning it naturally emits a gradient which we shall now hope to derive. Consider the partial derivative taken for some component \( v_k \). Observe that (using shorthand notation for partial derivatives for typing convenience)
+\[
+    \partial_{v_k} \Gamma_A (\vec{v}) = \frac{\| A \vec{v} \|^2 \| \vec{v} \|^2 \partial_{v_k} (A \vec{v} \cdot \vec{v})^2 - (A\vec{v} \cdot \vec{v})^2 \partial_{v_k} \| A \vec{v} \|^2 \| \vec{v} \|^2}{\| A \vec{v} \|^4 \| \vec{v} \|^4}
+.\]
+So now we must find some expressions for the following
+\[
+    \partial_{v_k} (A\vec{v} \cdot \vec{v})^2, \quad \partial_{v_k} \| A \vec{v} \|^2 \| \vec{v} \|^2
+.\]
+We shall tackle these in parts. We first note that
+\[
+    A \vec{v} = \begin{bmatrix} \vec{u}_1 & \vec{u}_2 & \cdots & \vec{u}_n \end{bmatrix} \vec{v} = \begin{bmatrix} \vec{w}_1 \\ \vec{w}_2 \\ \vdots \\ \vec{w}_n \end{bmatrix} \vec{v} = \begin{bmatrix}
+        \vec{w}_1 \cdot \vec{v} \\
+        \vec{w}_2 \cdot \vec{v} \\
+        \vdots \\
+        \vec{w}_n \cdot \vec{v} \\
+    \end{bmatrix} = \begin{bmatrix}
+        A_{11} v_1 + A_{12} v_2 + \cdots + A_{1n} v_n \\
+        A_{21} v_1 + A_{22} v_2 + \cdots + A_{2n} v_n \\
+        \vdots \\
+        A_{n1} v_1 + A_{n2} v_2 + \cdots + A_{nn} v_n
+    \end{bmatrix}
+.\]
+By basic rules of derivatives, we have that
+\begin{align*}
+    \partial_{v_k} (A \vec{v} \cdot \vec{v})^2 &= 2 (A \vec{v} \cdot \vec{v}) \, \partial_{v_k} (A \vec{v} \cdot \vec{v}) \\
+    &= 2 (A \vec{v} \cdot \vec{v}) (A \vec{v} \cdot \partial_{v_k} (\vec{v}) + \partial_{v_k} (A \vec{v}) \cdot \vec{v}) \\
+    &= 2 (A \vec{v} \cdot \vec{v}) (\vec{w}_k \cdot \vec{v} + \vec{u}_k \cdot \vec{v}) \\
+    &= 2 (A \vec{v} \cdot \vec{v}) ((\vec{w}_k + \vec{u}_k) \cdot \vec{v})
+.\end{align*}
+Similarly, for the second expression, we have
+\begin{align*}
+    \partial_{v_k} \| A \vec{v} \|^2 \| \vec{v} \|^2 &= \| A \vec{v} \|^2 \, \partial_{v_k} \left( \| \vec{v} \|^2 \right) + \partial_{v_k} \left( \| A \vec{v} \|^2 \right) \| \vec{v} \|^2 \\
+    &= 2 v_k \| A \vec{v} \|^2 + \| \vec{v} \|^2 \sum_{i = 1}^{n} \partial_{v_k} (\vec{w}_i \cdot \vec{v})^2 \\
+    &= 2 v_k \| A \vec{v} \|^2 + 2 \| \vec{v} \|^2 \sum_{i = 1}^{n} (\vec{w}_i \cdot \vec{v}) \, \partial_{v_k} (\vec{w}_i \cdot \vec{v}) \\
+    &= 2 v_k \| A \vec{v} \|^2 + 2 \| \vec{v} \|^2 \sum_{i = 1}^{n} A_{ik} \, (\vec{w}_i \cdot \vec{v}) \\
+    &= 2 v_k \| A \vec{v} \|^2 + 2 \| \vec{v} \|^2 (A \vec{v} \cdot \vec{u}_k)
+.\end{align*}
+I've no doubt that these values are terribly inefficient to compute, but it's interesting that the expression isn't entirely intractable.
+
+With the general expression for the partial derivative determined, we can now calculate the gradient as per usual:
+\[
+    \grad \Gamma_A (\vec{v}) = \begin{bmatrix}
+        \partial_{v_1} \Gamma_A (\vec{v}) \\
+        \partial_{v_2} \Gamma_A (\vec{v}) \\
+        \vdots \\
+        \partial_{v_n} \Gamma_A (\vec{v})
+    \end{bmatrix}
+.\]
+This allows us to define a sequence of converging guesses \( \vec{g}_1, \vec{g}_2, \cdots \) where \( \vec{g}_1 \) is determined by some intial choice and subsequent values in the sequence are determined by the recursion
+\[
+    \vec{g}_n = \textsf{normalize} \bigl(\vec{g}_{n-1} + \gamma_n \grad \Gamma_A (\vec{g}_{n-1}) \bigr)
+,\]
+where \( \gamma_n \) is some sequence that denotes a learning rate for steps of the gradient ascent process. In total, each calculation of \( \grad \Gamma_A (\vec{g}_n) \) takes \( O(n^2) \) time.
+
+Hopefully this works
+
+Actually this works with surpising success. One can probably uniformly distribute points around the unit ball and then run the process, although that is another order of magnitude slower probably.
+
+An interesting exercise would be to determine the convergence rate of this algorithm generally.
+
+\begin{remark}
+    One must note that this doesn't really handle eigenvectors that are associated with complex eigenvalues, but that's probably fine.
+\end{remark}
+
+Code:
+\verbatiminput{main.py}
+
+\end{document}
